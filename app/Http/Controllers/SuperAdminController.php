@@ -191,11 +191,9 @@
 			return view('SuperAdmin.subscribelist');
 		}
 		
-		public function subscribepaymentcheck($subscribe_id){
+		public function subscribe_details($subscribe_id){
 			$check_result = subscribePayment::where('subscribe_id','=',$subscribe_id)->get();
 			return view('SuperAdmin.subscribedetails',compact('check_result'));
-			// $arr = array('msg' => 'Successfully submit form using ajax', 'status' => true);
-			// return Response()->json($arr);
 		}
 		
 		public function manualactive($subscribe_id){

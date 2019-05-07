@@ -19,7 +19,7 @@
 
 	Route::get('/subscribelist', 'SuperAdminController@subscribelist');
 	Route::post('/subscribe-change', 'SuperAdminController@subscribe_change');
-	Route::get('/subscribepayment/{id}', 'SuperAdminController@subscribepaymentcheck');
+	Route::get('/subscribe-details/{id}', 'SuperAdminController@subscribe_details');
 	Route::get('/manual-active/{id}', 'SuperAdminController@manualactive');
 
 	// Agent //

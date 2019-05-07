@@ -13,6 +13,7 @@ use App\Model\userDetails;
 use App\Model\agent_payment;
 use App\Model\agent_commission;
 use App\Model\sub_domain;
+use App\Model\subscribePayment;
 
 class DataTableController extends Controller
 {
@@ -300,21 +301,68 @@ class DataTableController extends Controller
 					<button type="button" class="btn btn-info dropdown-toggle btn-xs" data-toggle="dropdown" aria-expanded="false">Action<span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button>
 					<ul class="dropdown-menu pull-right" role="menu">
 						<li>
-							<a href="'.url('/subscribepayment').'/'.$item->subscribe_id.'" ><i class="fa fa-eye"></i> View</a>
+							<a href="'.url('/subscribe-details').'/'.$item->subscribe_id.'" ><i class="fa fa-eye"></i> View</a>
 						</li>
 					</ul>
+				</div>
+				';
+				if(!empty($item->agent_id)){
+					$agent = $item->agentDetails->userDetails['first_name'].' '.$item->agentDetails->userDetails['last_name'];
+				}else{
+					$agent = "N/A";
+				}
+
+				return [
+					'subscribe_id' => (int) $item->subscribe_id,
+					'user' => (string) $item->user->userDetails['first_name'].' '.$item->user->userDetails['last_name'],
+					'agent' => (string) $agent,
+					'software' => $item->softwareDetails['software_title'] ?? "N/A",
+					'variation_name' => $item->softwareVariationDetails['software_variation_name'] ?? "N/A",
+					'subscribe_date' => (string) Carbon\Carbon::parse($item->subscribe_date)->format('H:i:s d-m-Y'),
+					'subscribe_billing_trams' =>$item->subscribe_billing_trams,
+					'subscribe_cupon' => $item->subscribe_cupon | "N/A",
+					'status' => $status,
+					'action' => $action
+                    ];
+                })
+			->toJson();
+
+	    	break;
+
+	    	case "subscribe_details_datatable":
+
+			return datatables()->eloquent(subscribePayment::query()->where('subscribe_id','=',$user_id))
+			->orderColumn('subscribe_payment_id', '-subscribe_payment_id $1')
+			->setTransformer(function($item){
+
+				if($item->subscribe_payment_status=='paid'){
+					$status  = '<button type="button" class="btn btn-primary btn-xs">Paid</button>';
+					$action_button = false;
+				}elseif($item->subscribe_payment_status=='due'){
+					$status  = '<button type="button" class="btn btn-warning btn-xs">Due</button>';
+					$action_button = '<li><a href="javascript:void(0)" class="manuali_active" subscribe_id="'.$item->subscribe_id.'" ><i class="fa fa-ioxhost"></i> Inctive</a></li>';
+				}elseif($item->subscribe_payment_status=='cancel'){
+					$status  = '<button type="button" class="btn btn-info btn-xs">Cancel</button>';
+					$action_button = false;
+				}
+
+				$action = '
+				<div class="btn-group">
+					<button type="button" class="btn btn-info dropdown-toggle btn-xs" data-toggle="dropdown" aria-expanded="false">Action<span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button>
+					<ul class="dropdown-menu pull-right" role="menu">'.$action_button.'</ul>
 				</div>
 				';
 
 				return [
 					'subscribe_id' => (int) $item->subscribe_id,
-					'user' => (string) $item->user->userDetails['first_name'].' '.$item->user->userDetails['last_name'],
-					'agent' => $item->agentDetails->userDetails['first_name'].' '.$item->agentDetails->userDetails['last_name'],
-					'software' => $software ?? "N/A",
-					'variation_name' => $variation_name ?? "N/A",
-					'subscribe_date' => $item->subscribe_date ,
-					'subscribe_billing_trams' =>$item->subscribe_billing_trams,
-					'subscribe_cupon' => $item->subscribe_cupon | "N/A",
+					'software' => $item->softwareDetails['software_title'] ?? "N/A",
+					'software_variation' => $item->softwareVariationDetails['software_variation_name'] ?? "N/A",
+					'start_date' => $item->subscribe_start_date,
+					'end_date' => $item->subscribe_end_date,
+					'payment_amount' => $item->subscribe_payment_amount,
+					'transaction_iD' =>$item->subscribe_payment_transaction_id,
+					'month' => $item->subscribe_month,
+					'payment_time' => (string) Carbon\Carbon::parse($item->payment_time)->format('H:i:s d-m-Y'),
 					'status' => $status,
 					'action' => $action
                     ];
@@ -337,7 +385,7 @@ class DataTableController extends Controller
 				if(!empty($item->document)){
 					$document = "<a href='".url('/download-file').'/'.$item->document.'/promo_document'."' class='label label-success'><i class='fa fa-file'></i></a>";
 				}else{
-					$document = "<label class='label label-danger'><i class='fa fa-times'></label>";
+					$document = "<i class='fa fa-times'></i>";
 				}
 
 				$action = '

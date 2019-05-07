@@ -95,7 +95,7 @@ if(strpos($permission, ',') !== false) {
 						@if($uri_segments[2]=='super-admin-manage')<li class="active">@else<li>@endif
 							<a href="{{url('/super-admin-manage')}}"><i class="fa fa-superpowers"></i> <span class="nav-label">Super Admin Manage</span></a>
 						</li>                                        
-						@if($uri_segments[2]=='subscribelist'||$uri_segments[2]=='subscribepayment')<li class="active">@else<li>@endif
+						@if($uri_segments[2]=='subscribelist'||$uri_segments[2]=='subscribe-details')<li class="active">@else<li>@endif
 							<a href="{{url('/subscribelist')}}"><i class="fa fa-credit-card"></i> <span class="nav-label">Subscribe Log</span></a>
 						</li> 
 						@if($uri_segments[2]=='promotion-manage')<li class="active">@else<li>@endif
